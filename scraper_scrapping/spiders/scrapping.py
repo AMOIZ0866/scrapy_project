@@ -1,12 +1,9 @@
 import json
 import os
-import pdb
-
 import datefinder as datefinder
 import scrapy
 from scrapy import Selector
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -15,17 +12,27 @@ from scrapy import Request
 
 
 class BlogSpider(scrapy.Spider):
+    """
+    The crwaling start with start_request function. The url is passed to driver.get()
+    """
     name = 'blogspider'
 
     def start_requests(self):
+        # config the options
         url_list = []
-        global returns_page1
         options = Options()
         options.headless = False
         options.add_argument("--window-size=1920,1200")
 
+        # web driver Configuration
         PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
         DRIVER_BIN = os.path.join(PROJECT_ROOT, "chromedriver")
+
+        """
+        In the below code, webdriver is used to get list of book url links from the parent url
+        """
+
+        """Code of Selinium start here"""
 
         # Code to Fetch the List of Links Online through WebDriver#
 
@@ -50,11 +57,13 @@ class BlogSpider(scrapy.Spider):
         # json_object = json.dumps(url_list, indent=4)
         # output_file.write(json_object)
 
-        # Code to Get the Link list As saved in the local json file from web driver#
+        """Selenium Code Ends Here """
+
+        """ Code to Get the Link list As saved in the local json file from web driver """
         with open('link_list.json') as f:
             url_list = json.load(f)
 
-        # Code the make request to each url in the link list#
+        """Code the make request to each url in the link list"""
         for url in url_list:
             yield Request(url, callback=self.parse)
 
@@ -93,9 +102,12 @@ class BlogSpider(scrapy.Spider):
         books['Description'] = desc
 
         # the list that contain the data of all books
-        booklist=[]
+        booklist = []
 
-        # if the file with data is present than try will work otherwise it will go to exception where new file willbe genrated
+        """
+        if the file with data is present than try will work otherwise it will go to exception where new file willbe genrated
+        """
+
         try:
             with open('book_list.json', 'r') as fp:
                 information = json.load(fp)
@@ -110,6 +122,3 @@ class BlogSpider(scrapy.Spider):
             booklist.append(books)
             json_object = json.dumps(booklist, indent=4)
             output_file.write(json_object)
-
-
-
